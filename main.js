@@ -1,3 +1,4 @@
+import { GameLoop } from "./src/GameLoop";
 import { resources } from "./src/Resource";
 import { Sprite } from "./src/Sprite";
 import { Vector2 } from "./src/Vector2";
@@ -24,6 +25,10 @@ const hero = new Sprite({
 
 const heroPos = new Vector2(16 * 5, 16 * 1);
 
+const update = () => {
+  // Updating entities in the game
+};
+
 const draw = () => {
   const heroOffset = new Vector2(-8, -21);
   const heroPosX = heroPos.x + heroOffset.x;
@@ -32,7 +37,6 @@ const draw = () => {
   hero.drawImage(ctx, heroPosX, heroPosY);
 };
 
-setInterval(() => {
-  hero.frame += 1;
-  draw();
-}, 300);
+const gameLoop = new GameLoop(update, draw);
+
+gameLoop.start();
