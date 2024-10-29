@@ -1,4 +1,6 @@
 import { GameLoop } from "./src/GameLoop";
+import { gridCells } from "./src/helpers/grid";
+import { moveTowards } from "./src/helpers/moveTowards";
 import { Input, KEY } from "./src/Input";
 import { resources } from "./src/Resource";
 import { Sprite } from "./src/Sprite";
@@ -22,38 +24,67 @@ const hero = new Sprite({
   hFrames: 6,
   vFrames: 10,
   frame: 1,
+  position: new Vector2(gridCells(6), gridCells(3)),
 });
-
-const heroPos = new Vector2(16 * 5, 16 * 1);
 
 const input = new Input();
 
+const heroDestinationPosition = hero.position.duplicate();
+
 const update = () => {
   // Updating entities in the game
+
+  const distance = moveTowards(hero, heroDestinationPosition, 1);
+  const hasArrived = distance <= 1;
+  if (hasArrived) {
+    tryMove();
+  }
+};
+
+const tryMove = () => {
+  if (!input.direction) {
+    return;
+  }
+
+  let nextX = heroDestinationPosition.x;
+  let nextY = heroDestinationPosition.y;
+  const gridSize = 16;
+
   if (input.direction === KEY.DOWN) {
-    heroPos.y += 1;
+    nextY += gridSize;
     hero.frame = 0;
   }
 
   if (input.direction === KEY.UP) {
-    heroPos.y -= 1;
+    nextY -= gridSize;
+
     hero.frame = 14;
   }
 
   if (input.direction === KEY.RIGHT) {
-    heroPos.x += 1;
+    nextX += gridSize;
     hero.frame = 7;
+    hero.setDirection(KEY.RIGHT);
   }
 
   if (input.direction === KEY.LEFT) {
-    heroPos.x -= 1;
+    nextX -= gridSize;
+
+    hero.frame = 7;
+    hero.setDirection(KEY.LEFT);
   }
+
+  //TODO: Check if that space is free
+  console.log(nextX, nextY);
+
+  heroDestinationPosition.x = nextX;
+  heroDestinationPosition.y = nextY;
 };
 
 const draw = () => {
   const heroOffset = new Vector2(-8, -21);
-  const heroPosX = heroPos.x + heroOffset.x;
-  const heroPosY = heroPos.y + heroOffset.y;
+  const heroPosX = hero.position.x + heroOffset.x;
+  const heroPosY = hero.position.y + heroOffset.y;
   treeSprite.drawImage(ctx, 0, 0);
   hero.drawImage(ctx, heroPosX, heroPosY);
 };

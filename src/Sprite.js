@@ -1,3 +1,4 @@
+import { KEY } from "./Input";
 import { Vector2 } from "./Vector2";
 
 export class Sprite {
@@ -18,6 +19,7 @@ export class Sprite {
     this.frameMap = new Map();
     this.scale = scale ?? 1;
     this.position = position ?? new Vector2(0, 0);
+    this.direction = KEY.RIGHT;
     this.buildFrameMap();
   }
   buildFrameMap() {
@@ -31,6 +33,10 @@ export class Sprite {
         frameCount++;
       }
     }
+  }
+
+  setDirection(direction) {
+    this.direction = direction;
   }
 
   /**
@@ -56,16 +62,26 @@ export class Sprite {
     const frameSizeX = this.frameSize.x;
     const frameSizeY = this.frameSize.y;
 
+    ctx.save();
+    if (this.direction === KEY.LEFT) {
+      ctx.translate(x + frameSizeX * this.scale, y);
+      ctx.scale(-1, 1);
+    } else {
+      ctx.translate(x, y);
+    }
+
     ctx.drawImage(
       this.resource.image,
       frameCoordX,
       frameCoordY, // Top y corner of frame
       frameSizeX, // How much to crop from the sprite sheet (X)
       frameSizeY, // How much to crop from the sprite sheet (Y)
-      x, // Where to place this on the canvas tag (X)
-      y, // Where to place this on the canvas tag (Y)
+      0, // Where to place this on the canvas tag (X)
+      0, // Where to place this on the canvas tag (Y)
       frameSizeX * this.scale, // How large it scale(X)
       frameSizeY * this.scale // How large it scale(Y)
     );
+
+    ctx.restore();
   }
 }
